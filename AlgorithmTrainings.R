@@ -110,7 +110,7 @@ processTraining <- function(trainings) {
         mutate("Weekday" = wday(Date, label = TRUE, abbr = FALSE)) %>%
         mutate("Hour"    = hour(Date)) %>%
         mutate("Pace"    = getTrainingPace(Time/60,Distance)) %>%
-        mutate("Pace Description" = ntile(Pace,5)) 
+        mutate("Pace Description" = dplyr::ntile(Pace,5)) 
     
     trainings[which(trainings$"Pace Description"==1),]$"Pace Description" <- "Very Fast"
     trainings[which(trainings$"Pace Description"==2),]$"Pace Description" <- "Fast"
