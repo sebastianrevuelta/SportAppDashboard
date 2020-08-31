@@ -27,8 +27,8 @@ paintHeight = function(path,fileName) {
 readFromStrava = function() {
     
     files = list.files(str_glue(getwd(),"/stravaInfo/"),pattern = ".json")
-    trainings <- data.frame(matrix(ncol = 13))
-    colnames(trainings) <- c("ID","Date","Time","Distance","Year","Month",
+    trainings <- data.frame(matrix(ncol = 14))
+    colnames(trainings) <- c("ID","Date","Time","Distance","Elevation","Year","Month",
                              "Day","Hour","Weekday","Pace","Sport","Calories","Notes")
 
     ##TODO: Mutate to create each column from the list
@@ -47,6 +47,7 @@ readFromStrava = function() {
             trainings[counter,]$Date     = data[[j]]$start_date_local  ## TimeStamp
             trainings[counter,]$Time     = as.numeric(data[[j]]$moving_time) ## Time
             trainings[counter,]$Distance = as.numeric(data[[j]]$distance) ## Distance
+            trainings[counter,]$Elevation = as.numeric(data[[j]]$total_elevation_gain) ## Elevation
             trainings[counter,]$Calories = 0 ## Calories
             trainings[counter,]$Sport    = data[[j]]$type
         }
@@ -190,7 +191,7 @@ plot_line_evolution <- function(df,var1,var2,unit,ncolor) {
                    size = 4,
                    vjust = -1) +
         ##Format
-        theme_tq() +
+        theme_light() +
         expand_limits(y = max(df[[var2]])) +
         scale_y_continuous() +
         labs(
@@ -219,7 +220,7 @@ plot_col_evolution <- function(df,var1,var2,unit,ncolor) {
                    fontface = "bold",
                    size = 4) +
         ##Format
-        theme_tq() +
+        theme_light() +
         labs(
             title = paste(var2,"Evolution by",var1),
             subtitle = "",
@@ -244,7 +245,7 @@ plot_col_evolution_no_flip <- function(df,var1,var2,unit,ncolor) {
                    fontface = "bold",
                    size = 4) +
         ##Format
-        theme_tq() +
+        theme_light() +
         labs(
             title = paste(var2,"Evolution by",var1),
             subtitle = "",

@@ -1,34 +1,31 @@
 # 1. Load libraries ----
 library("shinydashboard")
 library("shinyjs")
-library("stringr")
-library("plyr")
-library("lubridate")
-library("tidyquant")
-library("readr")
 library("shinyalert")
-library("leaflet")
-library("XML")
+
+library("plyr")
+library("dplyr")
+
+library("lubridate")
+library("forcats")
+library("readr")
+library("stringr")
+
 library("methods")
-library("xlsx")
 library("DT")
-library("purrr")
+
+library("ggplot2")
 
 source('AlgorithmTrainings.R')
-#source('ProcessXML.R')
 source('Constants.R')
 
-#setwd("C:/Users/srevuelta/OneDrive/Documentos/BusinessIntelligence/SportApp/")
 dfTrainings <- read_rds("dfTrainings.rds")
 
-#tracks <- read_rds("dfTracks.rds")
 #filter 1999 year
 dfTrainings <- dfTrainings %>%
-    filter(Year > 2000) 
+    dplyr::filter(dfTrainings$Year > 2000) 
 
-#dfTrainings <- time4Training("C:/Users/srevuelta/Dropbox/Aplicaciones/tapiriik")
-
-sport_list <- as.list(sort(unique(dfTrainings$Sport)))
+sport_list <- as.list(sort(unique(dfTrainings$`Sport`)))
 sport_list <- c(as.list("All sports"),sport_list)
 
 period_list <- as.list(c("year","quarter","month","week"))
@@ -37,13 +34,12 @@ period_list <- as.list(c("year","quarter","month","week"))
 # 4. Shiny App Header ----
 header <- dashboardHeader(title = "My Trainings",dropdownMenuOutput("alertMenu")) ##TODO ADD FROM ... TO...
 
+
 # 5. Shiny App Sidebar ----
 sidebar <- dashboardSidebar(
   sidebarMenu(
-     menuItem("Home", tabName = "Home", icon = icon("home")),
-     menuItem("Evolution", tabName = "evolution", icon = icon("home"))
-     #menuItem("Prediction", tabName = "prediction", icon = icon("home")),
-     #menuItem("Maps", tabName = "evolution", icon = icon("home"))
+     menuItem("Home", tabName = "Home"),
+     menuItem("Evolution", tabName = "Evolution")
   )
 )
 
@@ -78,7 +74,7 @@ body <- dashboardBody(
                  shinydashboard::box(DT::dataTableOutput('training_table'),width = 12),
                  shinydashboard::box(plotOutput("time_by_sport"),width = 12))
       ),
-      tabItem(tabName = "evolution",
+      tabItem(tabName = "Evolution",
               fluidRow(
                   shinydashboard::box(plotOutput("distance"),width = 12),
                   shinydashboard::box(plotOutput("time"),width = 12),
@@ -138,10 +134,9 @@ server <- function(input, output, session) {
             dfTrainings <- dfTrainings %>% 
                 filter(Date >= date1 & Date <= date2)
         }
-        print(nrow(dfTrainings))
+
         valueBox(
-            nrow(dfTrainings), "Trainings", icon = icon("thumbs-up", lib = "glyphicon"),
-            color = "blue"
+            nrow(dfTrainings), "Trainings", color = "blue"
         )
     })    
 
@@ -164,8 +159,7 @@ server <- function(input, output, session) {
         }
         
         valueBox(
-            sum(dfTrainings$Distance), "Total Distance (km)", icon = icon("thumbs-up", lib = "glyphicon"),
-            color = "blue"
+            sum(dfTrainings$Distance), "Total Distance (km)", color = "blue"
         )
     }) 
     
@@ -190,8 +184,7 @@ server <- function(input, output, session) {
         s <- str_sub(as.character(seconds_to_period(sum(dfTrainings$Time))),0,10)
         
         valueBox(
-            s, "Total Time", icon = icon("thumbs-up", lib = "glyphicon"),
-            color = "blue"
+            s, "Total Time", color = "blue"
         )
     }) 
     
@@ -213,7 +206,7 @@ server <- function(input, output, session) {
         }
         
         valueBox(
-            round(mean(dfTrainings$Distance),digits = 2), "Average Km per training", icon = icon("thumbs-up", lib = "glyphicon"),
+            round(mean(dfTrainings$Distance),digits = 2), "Average Km per training",
             color = "green"
         )
     })    
@@ -237,7 +230,7 @@ server <- function(input, output, session) {
         }
         
         valueBox(
-            seconds_to_period(round(mean(dfTrainings$Time),digits=0)),"Average time per training", icon = icon("thumbs-up", lib = "glyphicon"),
+            seconds_to_period(round(mean(dfTrainings$Time),digits=0)),"Average time per training",
             color = "green"
         )
     })         
@@ -262,7 +255,7 @@ server <- function(input, output, session) {
         }
         
         valueBox(
-            round(getTrainingPace(sum(dfTrainings$Time/60),sum(dfTrainings$Distance)),digits=2),"Average Pace per training", icon = icon("thumbs-up", lib = "glyphicon"),
+            round(getTrainingPace(sum(dfTrainings$Time/60),sum(dfTrainings$Distance)),digits=2),"Average Pace per training",
             color = "green"
         )
     })    
@@ -280,7 +273,7 @@ server <- function(input, output, session) {
         }
         
         valueBox(
-            time,"Best 10km time", icon = icon("thumbs-up", lib = "glyphicon"),
+            time,"Best 10km time",
             color = "red"
         )
     }) 
@@ -298,7 +291,7 @@ server <- function(input, output, session) {
         }
         
         valueBox(
-            time,"Best Half Marathon time", icon = icon("thumbs-up", lib = "glyphicon"),
+            time,"Best Half Marathon time",
             color = "red"
         )
     })
@@ -316,7 +309,7 @@ server <- function(input, output, session) {
         }
         
         valueBox(
-            time,"Best marathon time", icon = icon("thumbs-up", lib = "glyphicon"),
+            time,"Best marathon time",
             color = "red"
         )
     }) 
@@ -341,7 +334,7 @@ server <- function(input, output, session) {
     dfTrainings <- dfTrainings[order(dfTrainings$"Date",decreasing = TRUE),]
     df <- dfTrainings %>% 
         mutate(Date = str_sub(Date,1,10)) %>%
-        select("Sport","Date","Time","Distance") %>%
+        select("Sport","Date","Time","Distance","Elevation") %>%
         mutate(Time = round(Time/60,digits=2)) %>%
         rename("Time (minutes)" = "Time") %>%
         rename("Distance (km)" = "Distance")
@@ -382,9 +375,9 @@ server <- function(input, output, session) {
             ggplot(aes(x = Date, y = total, color = Sport)) +     
             geom_point() + 
             geom_line(size=1.5) + 
-            facet_wrap(~ Sport) +
-            theme_tq() +
-            scale_color_tq() +
+            #facet_wrap(~ Sport) +
+            theme_light() +
+            #scale_color_tq() +
             scale_y_continuous() +
             labs(
                 title = "",
@@ -590,6 +583,5 @@ server <- function(input, output, session) {
     
 })
 }
-
 shinyApp(ui, server)
 
