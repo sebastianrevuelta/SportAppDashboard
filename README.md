@@ -7,9 +7,9 @@ It gathers info from Strava and then paint the graphs and tables in a shiny App.
 
 It is curious to see some metrics as:
 
-Fastest day of the week: Friday.
-Time more frequent to run: 18.00
-Check if I have better results in summer months or in winter months 😉
+* Fastest day of the week: Friday.
+* Time more frequent to run: 18.00
+* Check if I have better results in summer months or in winter months 😉
 The dashboard is here:
 
 https://runningwithr.shinyapps.io/SportApp/
