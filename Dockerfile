@@ -48,4 +48,6 @@ EXPOSE 3838
 # Copy further configuration files into the Docker image
 COPY shiny-server.sh /usr/bin/shiny-server.sh
 
+USER sebas
+
 CMD ["/usr/bin/shiny-server.sh"]
