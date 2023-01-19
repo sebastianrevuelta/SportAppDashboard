@@ -45,6 +45,8 @@ COPY dfTrainings.rds /srv/shiny-server/sportapp/
 # Make the ShinyApp available at port 3838
 EXPOSE 3838
 
+USER sebas
+
 # Copy further configuration files into the Docker image
 COPY shiny-server.sh /usr/bin/shiny-server.sh
 
